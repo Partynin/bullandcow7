@@ -95,17 +95,26 @@ public class DbBean {
                                        Connection connection) {
         try {
             if (resultSet.next()) {
-                resultSet.close();
-                statement.close();
-                connection.close();
                 return true;
-            } else {
-                resultSet.close();
-                statement.close();
-                connection.close();
             }
         } catch (Exception ex) {
             System.out.println(ex + " method IsResultSetHasNext in DbBean");
+        } finally {
+            try {
+                resultSet.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                statement.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         return false;
@@ -126,18 +135,21 @@ public class DbBean {
         try {
             Locale.setDefault(Locale.ENGLISH);
             Connection connection = DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
+            try {
+                Statement statement = connection.createStatement();
+                try {
+                    String sql = "INSERT INTO Users (UserName, Password, Email, NumberOfGames, " +
+                            "NumberOfTries) VALUES ('" +
+                            fixSqlFieldValue(userName) + "', '" + fixSqlFieldValue(password) +
+                            "', '" + fixSqlFieldValue(email) + "', 0, 0)";
 
-            Statement statement = connection.createStatement();
-
-            String sql = "INSERT INTO Users (UserName, Password, Email, NumberOfGames, " +
-                    "NumberOfTries) VALUES ('" +
-                    fixSqlFieldValue(userName) + "', '" + fixSqlFieldValue(password) +
-                    "', '" + fixSqlFieldValue(email) + "', 0, 0)";
-
-            i = statement.executeUpdate(sql);
-
-            statement.close();
-            connection.close();
+                    i = statement.executeUpdate(sql);
+                } finally {
+                    statement.close();
+                }
+            } finally {
+                connection.close();
+            }
         } catch (Exception ex) {
             System.out.println(ex + " method addUserDataInDB in DbBean");
         }
@@ -159,26 +171,29 @@ public class DbBean {
         try {
             Locale.setDefault(Locale.ENGLISH);
             Connection connection = DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
-
             connection.setAutoCommit(false);
-            Statement statement = connection.createStatement();
+            try {
+                Statement statement = connection.createStatement();
+                try {
+                    String sql = "SELECT numberOfGames, numberOfTries FROM users WHERE userName ='" +
+                            fixSqlFieldValue(userName) + "'";
 
-            String sql = "SELECT numberOfGames, numberOfTries FROM users WHERE userName ='" +
-                    fixSqlFieldValue(userName) + "'";
+                    ResultSet resultSet = statement.executeQuery(sql);
+                    while (resultSet.next()) {
+                        oldNumberGames = resultSet.getInt(1);
+                        oldTries = resultSet.getInt(2);
+                    }
 
-            ResultSet resultSet = statement.executeQuery(sql);
-            while (resultSet.next()) {
-                oldNumberGames = resultSet.getInt(1);
-                oldTries = resultSet.getInt(2);
+                    sql = "UPDATE Users SET numberOfGames = " + oldNumberGames + " + 1, numberOfTries = " +
+                            (oldTries + numberOfTries) + " WHERE userName = '" + fixSqlFieldValue(userName) + "'";
+                    statement.executeUpdate(sql);
+                } finally {
+                    statement.close();
+                }
+            } finally {
+                connection.commit();
+                connection.close();
             }
-
-            sql = "UPDATE Users SET numberOfGames = " + oldNumberGames + " + 1, numberOfTries = " +
-                    (oldTries + numberOfTries) + " WHERE userName = '" + fixSqlFieldValue(userName) + "'";
-            statement.executeUpdate(sql);
-
-            statement.close();
-            connection.commit();
-            connection.close();
         } catch (SQLException ex) {
             System.out.println(ex + " method addResultOfGameToDB");
         }
@@ -220,20 +235,29 @@ public class DbBean {
             Locale.setDefault(Locale.ENGLISH);
             Connection connection = DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
 
-            Statement statement = connection.createStatement();
-            String sql = "SELECT userName, numberOfGames, numberOfTries FROM users";
-            ResultSet resultSet = statement.executeQuery(sql);
-            while (resultSet.next()) {
-                int average = (int) Math.round(resultSet.getInt(3) /
-                        resultSet.getDouble(2));
-                if (average > 0) {
-                    map.put(resultSet.getString(1), average);
+            try {
+                Statement statement = connection.createStatement();
+                String sql = "SELECT userName, numberOfGames, numberOfTries FROM users";
+                try {
+                    ResultSet resultSet = statement.executeQuery(sql);
+                    try {
+                        while (resultSet.next()) {
+                            int average = (int) Math.round(resultSet.getInt(3) /
+                                    resultSet.getDouble(2));
+                            if (average > 0) {
+                                map.put(resultSet.getString(1), average);
+                            }
+                        }
+                    } finally {
+                        resultSet.close();
+                    }
+                } finally {
+                    statement.close();
                 }
+            } finally {
+                connection.close();
             }
 
-            resultSet.close();
-            statement.close();
-            connection.close();
         } catch (Exception ex) {
             System.out.println(ex + " method getResultsMap in DbBean");
         }
