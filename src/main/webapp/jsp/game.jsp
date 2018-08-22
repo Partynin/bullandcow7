@@ -34,7 +34,6 @@
                     <input type="number" name="number3" min="0" max="9" value="3">
                     <input type="number" name="number4" min="0" max="9" value="4">
                 </td>
-                <%--<td><input type="number" min="1" max="9999" step="1" name="guessNumber"></td>--%>
                 <td><input type="submit" value="Submit" class="btn"></td>
             </tr>
         </table>

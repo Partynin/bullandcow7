@@ -36,9 +36,8 @@ public class GameServlet extends HttpServlet {
             throws ServletException, IOException {
         session = request.getSession();
 
-        if (session.getAttribute("gameStart") == null ||
-                session.getAttribute("gameStart").equals("false") ||
-                request.getParameter("action") != null) {
+        if (session.getAttribute("gameStart") == null || session.getAttribute("gameStart").equals("false")
+                || request.getParameter("action") != null) {
             start(request, response);
         } else {
             String guessNumber = getGuessNumber(request);

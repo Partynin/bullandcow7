@@ -165,33 +165,20 @@ public class DbBean {
      * @param userName      the username for update the data
      */
     public void addResultOfGameToDB(int numberOfTries, String userName) {
-        int oldNumberGames = 0;
-        int oldTries = 0;
-
         try {
             Locale.setDefault(Locale.ENGLISH);
             Connection connection = DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
-            connection.setAutoCommit(false);
             try {
                 Statement statement = connection.createStatement();
                 try {
-                    String sql = "SELECT numberOfGames, numberOfTries FROM users WHERE userName ='" +
-                            fixSqlFieldValue(userName) + "'";
-
-                    ResultSet resultSet = statement.executeQuery(sql);
-                    while (resultSet.next()) {
-                        oldNumberGames = resultSet.getInt(1);
-                        oldTries = resultSet.getInt(2);
-                    }
-
-                    sql = "UPDATE Users SET numberOfGames = " + oldNumberGames + " + 1, numberOfTries = " +
-                            (oldTries + numberOfTries) + " WHERE userName = '" + fixSqlFieldValue(userName) + "'";
+                    String sql = "UPDATE USERS SET USERS.NUMBEROFGAMES = USERS.NUMBEROFGAMES + 1," +
+                            " USERS.NUMBEROFTRIES = USERS.NUMBEROFTRIES + "
+                            + numberOfTries + " WHERE USERNAME = '" + userName + "'";
                     statement.executeUpdate(sql);
                 } finally {
                     statement.close();
                 }
             } finally {
-                connection.commit();
                 connection.close();
             }
         } catch (SQLException ex) {

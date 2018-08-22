@@ -1,5 +1,4 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<% //todo make rechecking load driver in ControllerServlet %>
 <html>
 <head>
     <title>Index Page</title>
