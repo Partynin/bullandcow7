@@ -121,6 +121,7 @@ public class GameServlet extends HttpServlet {
      * Returns a String representing the Bull and Cow in the guess number.
      *
      * @param guessNumber the number what was entered user like a guess
+     * @param request  the request information for the servlet
      * @return the string represents the number of bulls and cows that the user has guessed
      */
     private String obtainBullAndCow(String guessNumber, HttpServletRequest request) {
