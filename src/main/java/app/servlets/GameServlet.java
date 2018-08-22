@@ -22,8 +22,6 @@ import java.util.Map;
  */
 public class GameServlet extends HttpServlet {
 
-    private HttpSession session;
-
     /**
      * Determine if it is new game started and start new game or send
      * the guess number to check.
@@ -34,7 +32,7 @@ public class GameServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        session = request.getSession();
+        HttpSession session = request.getSession();
 
         if (session.getAttribute("gameStart") == null || session.getAttribute("gameStart").equals("false")
                 || request.getParameter("action") != null) {
@@ -76,11 +74,12 @@ public class GameServlet extends HttpServlet {
      */
     private void checkGuess(String guessNumber, HttpServletRequest request,
                             HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
         String number = (String) session.getAttribute("number");
         Map<String, String> map = (Map<String, String>) session.getAttribute("guessNumbersMap");
 
         if (number.matches(guessNumber)) {
-            map.put(guessNumber, obtainBullAndCow(guessNumber));
+            map.put(guessNumber, obtainBullAndCow(guessNumber, request));
             request.setAttribute("gameEnd", "true");
             session.setAttribute("gameStart", "false");
 
@@ -90,7 +89,7 @@ public class GameServlet extends HttpServlet {
                     request.getRequestDispatcher("/jsp/game.jsp");
             requestDispatcher.forward(request, response);
         } else {
-            map.put(guessNumber, obtainBullAndCow(guessNumber));
+            map.put(guessNumber, obtainBullAndCow(guessNumber, request));
             RequestDispatcher requestDispatcher =
                     request.getRequestDispatcher("/jsp/game.jsp");
             requestDispatcher.forward(request, response);
@@ -105,6 +104,7 @@ public class GameServlet extends HttpServlet {
      */
     private void start(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
         NumberGenerator numberGenerator = new NumberGenerator();
         String number = numberGenerator.generateNumber();
 
@@ -123,7 +123,8 @@ public class GameServlet extends HttpServlet {
      * @param guessNumber the number what was entered user like a guess
      * @return the string represents the number of bulls and cows that the user has guessed
      */
-    private String obtainBullAndCow(String guessNumber) {
+    private String obtainBullAndCow(String guessNumber, HttpServletRequest request) {
+        HttpSession session = request.getSession();
         String number = (String) session.getAttribute("number");
 
         int countBull = 0;
@@ -150,6 +151,7 @@ public class GameServlet extends HttpServlet {
      * @param numberOfTries the number of attempts by the user to guess the number
      */
     private void addResultToBD(int numberOfTries, HttpServletRequest request) {
+        HttpSession session = request.getSession();
         ServletContext context = request.getServletContext();
         DbBean dbBean = (DbBean) context.getAttribute("dbBean");
 

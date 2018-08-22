@@ -17,16 +17,9 @@ import java.io.IOException;
  */
 public class RegistrationServlet extends HttpServlet {
 
-    private String userName = "";
-    private String password = "";
-    private String email = "";
-    private DbBean dbBean;
-    private HttpServletRequest request;
-    private HttpServletResponse response;
-
     /**
-     * Obtains the user name, password, email from request parameter and dbBean from context
-     * and invokes the method register user.
+     * Obtains the user name, password, email from request parameter and dbBean from context.
+     * Checks if username is available and add the new user in the DB.
      *
      * @param request  the request information for the servlet
      * @param response the response information for the servlet
@@ -34,24 +27,13 @@ public class RegistrationServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        userName = request.getParameter("userName");
-        password = request.getParameter("password");
-        email = request.getParameter("email");
+        String userName = request.getParameter("userName");
+        String password = request.getParameter("password");
+        String email = request.getParameter("email");
 
         ServletContext context = request.getServletContext();
-        dbBean = (DbBean) context.getAttribute("dbBean");
+        DbBean dbBean = (DbBean) context.getAttribute("dbBean");
 
-        this.request = request;
-        this.response = response;
-
-        registerUser();
-    }
-
-    /**
-     * Checks if username is available and add the new user in the DB.
-     */
-    private void registerUser()
-            throws ServletException, IOException {
         if (!dbBean.isRegistered(userName)) {
             int i = dbBean.addUserDataInDB(userName, password, email);
             RequestDispatcher requestDispatcher =

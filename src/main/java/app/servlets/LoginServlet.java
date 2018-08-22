@@ -19,10 +19,6 @@ import java.io.IOException;
  */
 public class LoginServlet extends HttpServlet {
 
-    private HttpServletRequest request;
-    private HttpServletResponse response;
-    private DbBean dbBean;
-
     /**
      * Obtains the DbBean object from the context and the user name and password
      * from the query parameter.Invokes the checkLogin method.
@@ -33,15 +29,12 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         ServletContext context = request.getServletContext();
-        dbBean = (DbBean) context.getAttribute("dbBean");
+        DbBean dbBean = (DbBean) context.getAttribute("dbBean");
 
         String userName = request.getParameter("userName");
         String password = request.getParameter("password");
 
-        this.request = request;
-        this.response = response;
-
-        checkLogin(userName, password);
+        checkLogin(userName, password, request, response, dbBean);
     }
 
     /**
@@ -50,8 +43,12 @@ public class LoginServlet extends HttpServlet {
      *
      * @param userName the name of user
      * @param password password of user
+     * @param request  the request information for the servlet
+     * @param response the response information for the servlet
+     * @param dbBean the database bean for connecting and execute query to the DB
      */
-    private void checkLogin(String userName, String password)
+    private void checkLogin(String userName, String password,
+                            HttpServletRequest request, HttpServletResponse response, DbBean dbBean)
             throws ServletException, IOException {
         if (dbBean.login(userName, password)) {
             request.getSession().invalidate();
