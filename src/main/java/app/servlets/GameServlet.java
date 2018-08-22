@@ -23,8 +23,10 @@ import java.util.Map;
 public class GameServlet extends HttpServlet {
 
     /**
-     * Determine if it is new game started and start new game or send
-     * the guess number to check.
+     * Determines the state of the game: the game is running the first time,
+     * the game is restarted, the game is over. Starts a new game.
+     * Otherwise, sends the number to the {@link #checkGuess(String,
+     * HttpServletRequest, HttpServletResponse)} method.
      *
      * @param request  the request information for the servlet
      * @param response the response information for the servlet
@@ -34,7 +36,8 @@ public class GameServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
 
-        if (session.getAttribute("gameStart") == null || session.getAttribute("gameStart").equals("false")
+        if (session.getAttribute("gameStart") == null
+                || session.getAttribute("gameStart").equals("false")
                 || request.getParameter("action") != null) {
             start(request, response);
         } else {
@@ -59,6 +62,8 @@ public class GameServlet extends HttpServlet {
                 guessNumber.append(digit);
             } else {
                 guessNumber.append("0");
+                if (request.getAttribute("wrongEnter") == null)
+                    request.setAttribute("wrongEnter", "err");
             }
         }
 
@@ -97,7 +102,7 @@ public class GameServlet extends HttpServlet {
     }
 
     /**
-     * Starts new game.
+     * Starts a new game.
      *
      * @param request  the request information for the servlet
      * @param response the response information for the servlet
@@ -121,7 +126,7 @@ public class GameServlet extends HttpServlet {
      * Returns a String representing the Bull and Cow in the guess number.
      *
      * @param guessNumber the number what was entered user like a guess
-     * @param request  the request information for the servlet
+     * @param request     the request information for the servlet
      * @return the string represents the number of bulls and cows that the user has guessed
      */
     private String obtainBullAndCow(String guessNumber, HttpServletRequest request) {
@@ -146,7 +151,7 @@ public class GameServlet extends HttpServlet {
     }
 
     /**
-     * Adds the results of the game to the database.
+     * Adds the results of the game to the database using the {@link DbBean}.
      *
      * @param request       the request information for the servlet
      * @param numberOfTries the number of attempts by the user to guess the number

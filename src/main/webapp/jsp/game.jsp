@@ -75,6 +75,15 @@
 <%
     }
 %>
+
+<%
+    if (request.getAttribute("wrongEnter") != null
+            && request.getAttribute("wrongEnter").equals("err")) {
+%>
+<p align="center" class="text-warning">Please, enter only digit from 0 to 9!</p>
+<%
+    }
+%>
 <div>
     <form action="game" method="get">
         <table align="center">

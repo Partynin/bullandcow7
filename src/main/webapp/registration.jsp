@@ -42,15 +42,20 @@
 <%
     if (request.getAttribute("userNameUsed") != null &&
             request.getAttribute("userNameUsed").equals("true")) {
-        out.print("<p align=\"center\" class=\"text-danger\">The user name " +
-                "<b>" + request.getAttribute("userName") + "</b> has been taken. " +
-                "Please select another name.</p>");
+%>
+<p align=center class=text-danger>
+    The user name <b><%=request.getAttribute("userName")%>
+</b> has been taken. Please select another name.
+</p>
+<%
     }
 %>
 <%
     if (request.getAttribute("userAdded") != null &&
             request.getAttribute("userAdded").equals("1")) {
-        out.print("<p align=\"center\" class=\"text-success\">Successfully added one user.</p>");
+%>
+<p align=center class=text-success>Successfully added one user.</p>
+<%
     }
 %>
 
