@@ -1,7 +1,6 @@
 package app.servlets;
 
 import app.entities.DbBean;
-import app.entities.NumberGenerator;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -11,8 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The servlet provides methods for managing the game. Checks the data entered by
@@ -110,16 +108,32 @@ public class GameServlet extends HttpServlet {
     private void start(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        NumberGenerator numberGenerator = new NumberGenerator();
-        String number = numberGenerator.generateNumber();
+        String number = generateNumber();
 
-        session.setAttribute("number", number + "");
+        session.setAttribute("number", number);
         session.setAttribute("gameStart", "true");
         session.setAttribute("guessNumbersMap", new LinkedHashMap<String, String>());
 
         RequestDispatcher requestDispatcher =
                 request.getRequestDispatcher("/jsp/game.jsp");
         requestDispatcher.forward(request, response);
+    }
+
+    /**
+     * Return the String representation of random number without duplicate digits.
+     *
+     * @return the string of four numbers
+     */
+    public String generateNumber() {
+        List<Integer> numbers = new LinkedList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9));
+        Collections.shuffle(numbers);
+
+        StringBuilder number = new StringBuilder();
+        for (int i = 0; i < 4; i++) {
+            number.append(numbers.get(i));
+        }
+
+        return number.toString();
     }
 
     /**

@@ -45,7 +45,7 @@ public class LoginServlet extends HttpServlet {
      * @param password password of user
      * @param request  the request information for the servlet
      * @param response the response information for the servlet
-     * @param dbBean the database bean for connecting and execute query to the DB
+     * @param dbBean   the database bean for connecting and execute query to the DB
      */
     private void checkLogin(String userName, String password,
                             HttpServletRequest request, HttpServletResponse response, DbBean dbBean)
